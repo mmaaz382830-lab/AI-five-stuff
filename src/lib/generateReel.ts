@@ -11,6 +11,8 @@ import {
   getRandom
 } from "./templates";
 
+export type GenerateMode = "template" | "ai";
+
 export type GenerateInputs = {
   topic: string;
   style: string;
@@ -18,6 +20,7 @@ export type GenerateInputs = {
   duration: string;
   language: string;
   creativity: string;
+  mode?: GenerateMode;
 };
 
 export function generateReelFromTemplate(inputs: GenerateInputs): ReelPackage {
@@ -42,4 +45,32 @@ export function generateReelFromTemplate(inputs: GenerateInputs): ReelPackage {
     isFavorite: false,
     createdAt: new Date().toISOString(),
   };
+}
+
+export async function generateReelFromAI(inputs: GenerateInputs): Promise<ReelPackage> {
+  const response = await fetch("/api/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(inputs),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Failed to generate AI reel");
+  }
+
+  return {
+    ...data.result,
+    id: crypto.randomUUID(),
+    topic: inputs.topic,
+    style: inputs.style,
+    format: inputs.format,
+    duration: inputs.duration,
+    language: inputs.language,
+    isFavorite: false,
+    createdAt: new Date().toISOString(),
+  } as ReelPackage;
 }

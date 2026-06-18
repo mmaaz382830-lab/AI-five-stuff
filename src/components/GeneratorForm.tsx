@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { GenerateInputs } from "@/lib/generateReel";
+import { GenerateInputs, GenerateMode } from "@/lib/generateReel";
 
 interface GeneratorFormProps {
   onGenerate: (inputs: GenerateInputs) => void;
+  isGenerating?: boolean;
 }
 
-export default function GeneratorForm({ onGenerate }: GeneratorFormProps) {
+export default function GeneratorForm({ onGenerate, isGenerating = false }: GeneratorFormProps) {
   const [formData, setFormData] = useState<GenerateInputs>({
     topic: "Student Life",
     style: "Funny",
@@ -15,12 +16,17 @@ export default function GeneratorForm({ onGenerate }: GeneratorFormProps) {
     duration: "15 seconds",
     language: "English",
     creativity: "Balanced",
+    mode: "template",
   });
 
   const [customTopic, setCustomTopic] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleModeChange = (mode: GenerateMode) => {
+    setFormData({ ...formData, mode });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -34,6 +40,33 @@ export default function GeneratorForm({ onGenerate }: GeneratorFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-lg space-y-6">
+      
+      {/* Mode Toggle */}
+      <div className="flex bg-black p-1 rounded-lg border border-gray-800">
+        <button
+          type="button"
+          onClick={() => handleModeChange("template")}
+          className={`flex-1 py-2 text-sm font-bold rounded-md transition-colors ${
+            formData.mode === "template" 
+              ? "bg-blue-600 text-white" 
+              : "text-gray-400 hover:text-gray-200"
+          }`}
+        >
+          Template Mode
+        </button>
+        <button
+          type="button"
+          onClick={() => handleModeChange("ai")}
+          className={`flex-1 py-2 text-sm font-bold rounded-md transition-colors ${
+            formData.mode === "ai" 
+              ? "bg-purple-600 text-white" 
+              : "text-gray-400 hover:text-gray-200"
+          }`}
+        >
+          AI Mode ✨
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Topic */}
         <div className="space-y-2">
@@ -121,8 +154,18 @@ export default function GeneratorForm({ onGenerate }: GeneratorFormProps) {
         </div>
       </div>
 
-      <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]">
-        Generate Reel Package
+      <button 
+        type="submit" 
+        disabled={isGenerating}
+        className={`w-full font-bold py-4 rounded-xl transition-all ${
+          isGenerating 
+            ? "bg-gray-700 text-gray-400 cursor-not-allowed" 
+            : formData.mode === "ai" 
+              ? "bg-purple-600 hover:bg-purple-500 text-white shadow-[0_0_15px_rgba(147,51,234,0.3)] hover:shadow-[0_0_25px_rgba(147,51,234,0.5)]"
+              : "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
+        }`}
+      >
+        {isGenerating ? "Generating..." : formData.mode === "ai" ? "Generate with AI ✨" : "Generate Reel Package"}
       </button>
     </form>
   );
