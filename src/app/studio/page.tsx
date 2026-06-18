@@ -48,8 +48,8 @@ export default function StudioPage() {
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2">Reel Studio</h1>
-        <p className="text-gray-400">Select your preferences to generate a complete reel package.</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold font-display text-white mb-2">Reel Studio</h1>
+        <p className="text-gray-300 leading-relaxed">Select your preferences to generate a complete reel package.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
