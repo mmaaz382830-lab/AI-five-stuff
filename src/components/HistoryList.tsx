@@ -6,6 +6,7 @@ import { getHistory, deleteReel, toggleFavorite, clearHistory } from "@/lib/stor
 import EmptyState from "./EmptyState";
 import FavoriteButton from "./FavoriteButton";
 import OutputCard from "./OutputCard";
+import ExportButton from "./ExportButton";
 import { useRouter } from "next/navigation";
 
 export default function HistoryList() {
@@ -111,6 +112,9 @@ export default function HistoryList() {
             {/* Expanded Content */}
             {expandedId === reel.id && (
               <div className="border-t border-gray-800 p-5 bg-black/30 space-y-4">
+                <div className="flex justify-end mb-2">
+                  <ExportButton reel={reel} />
+                </div>
                 <OutputCard title="Hook" content={reel.hook} />
                 <OutputCard title="Reel Script" content={reel.script} />
                 <OutputCard title="Scene Breakdown" content={reel.scenes} />

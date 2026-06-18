@@ -3,6 +3,7 @@
 import { useState } from "react";
 import GeneratorForm from "@/components/GeneratorForm";
 import OutputCard from "@/components/OutputCard";
+import ExportButton from "@/components/ExportButton";
 import { generateReelFromTemplate, GenerateInputs } from "@/lib/generateReel";
 import { ReelPackage } from "@/types";
 import { saveReel } from "@/lib/storage";
@@ -56,17 +57,20 @@ export default function StudioPage() {
                     Template Mode
                   </span>
                 </div>
-                <button
-                  onClick={handleSave}
-                  disabled={saved}
-                  className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${
-                    saved 
-                      ? "bg-green-900/40 text-green-400 border border-green-800 cursor-not-allowed" 
-                      : "bg-gray-800 hover:bg-gray-700 text-white"
-                  }`}
-                >
-                  {saved ? "Saved to History ✓" : "Save to History"}
-                </button>
+                <div className="flex items-center gap-2">
+                  <ExportButton reel={result} />
+                  <button
+                    onClick={handleSave}
+                    disabled={saved}
+                    className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${
+                      saved 
+                        ? "bg-green-900/40 text-green-400 border border-green-800 cursor-not-allowed" 
+                        : "bg-gray-800 hover:bg-gray-700 text-white"
+                    }`}
+                  >
+                    {saved ? "Saved ✓" : "Save"}
+                  </button>
+                </div>
               </div>
 
               <OutputCard title="Hook" content={result.hook} />

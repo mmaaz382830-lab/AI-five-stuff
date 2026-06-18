@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Five Stuff AI Reel Studio
 
-## Getting Started
+## Description
+Five Stuff AI Reel Studio is a clean, minimal, and fast web application designed to help the **Five Stuff** Instagram page generate complete content packages for short-form comedy reels (especially stickman animations). 
 
-First, run the development server:
+Instead of writing scripts, hooks, and prompts from scratch, this tool provides a structured output containing everything needed to produce a high-quality reel instantly.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+- **Reel Package Generator:** Instantly create a hook, script, scene breakdown, screen text, voiceover, AI video prompt, caption, and hashtags.
+- **Copy to Clipboard:** One-click copying for any section of the generated package.
+- **Local History & Favorites:** Automatically saves your generated reels directly to your browser's LocalStorage. Mark your best ideas as favorites.
+- **Export to .txt:** Download your entire generated reel package cleanly formatted as a `.txt` file for offline use.
+- **Mobile Responsive:** A clean, dark, creator-focused UI that works perfectly on both desktop and mobile devices.
+
+## Tech Stack
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS (Dark theme)
+- **Storage:** Browser LocalStorage
+- **Deployment:** Vercel (Planned)
+
+## Project Structure
+```text
+five-stuff-reel-studio/
+├── src/
+│   ├── app/           # Next.js App Router pages (/, /studio, /history)
+│   ├── components/    # Reusable UI components (Navbar, GeneratorForm, OutputCard, etc.)
+│   ├── lib/           # Utility functions (templates.ts, generateReel.ts, storage.ts, exportText.ts)
+│   └── types/         # TypeScript type definitions (ReelPackage)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How to Run Locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Learning Goals
+This project was built to improve skills in:
+- Modern Frontend Development (Next.js & React)
+- Tailwind CSS UI/UX polish
+- TypeScript strict typing
+- Local browser storage management
+- Clean JSON/Data structuring for content generation
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Future Improvements
+- **Optional AI Mode:** Integrate the Gemini API to dynamically generate fully unique scripts and prompts via a secure serverless route (Template-based generation is currently live).
+- **Reel Calendar:** Plan content over a visual timeline.
+- **More Formats:** Add Dakhni mode, Kannada/Hindi translations, and ElevenLabs voice script formatting.
