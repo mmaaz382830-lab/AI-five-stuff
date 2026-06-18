@@ -15,4 +15,5 @@ export type ReelPackage = {
   hashtags: string[];
   isFavorite: boolean;
   createdAt: string;
+  mode?: "template" | "ai";
 };

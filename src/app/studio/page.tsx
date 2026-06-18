@@ -73,22 +73,24 @@ export default function StudioPage() {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               <p className="font-semibold text-lg animate-pulse">Generating your Reel Package...</p>
-              <p className="text-gray-500 text-sm mt-2">This usually takes about 5-10 seconds with AI.</p>
+              <p className="text-gray-400 text-sm mt-2">This usually takes about 5-10 seconds with AI.</p>
             </div>
           ) : !result ? (
-            <div className="h-full min-h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-2xl bg-gray-900/50 text-gray-500 p-8 text-center">
+            <div className="h-full min-h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-2xl bg-gray-900/50 text-gray-400 p-8 text-center">
               <span className="text-4xl mb-4">✨</span>
               <p>Your generated reel package will appear here.</p>
               <p className="text-sm mt-2">Fill out the form and hit generate to get started.</p>
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className={`rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border ${
+                generatedMode.includes('AI') ? 'bg-purple-900/20 border-purple-800/50 shadow-[0_0_15px_rgba(147,51,234,0.1)]' : 'bg-blue-900/20 border-blue-800/50'
+              }`}>
                 <div>
-                  <span className="text-blue-400 font-semibold mr-2">Topic:</span>
+                  <span className={`${generatedMode.includes('AI') ? 'text-purple-400' : 'text-blue-400'} font-semibold mr-2`}>Topic:</span>
                   <span className="text-white mr-3">{result.topic}</span>
                   <span className={`text-xs px-3 py-1 rounded-full inline-block mt-2 sm:mt-0 ${
-                    generatedMode.includes('AI') ? 'bg-purple-900 text-purple-200' : 'bg-blue-900 text-blue-200'
+                    generatedMode.includes('AI') ? 'bg-purple-900/50 text-purple-200 border border-purple-800' : 'bg-blue-900/50 text-blue-200'
                   }`}>
                     {generatedMode}
                   </span>

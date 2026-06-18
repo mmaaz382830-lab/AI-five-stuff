@@ -13,7 +13,7 @@ export default function EmptyState({ title, description, actionText, onAction, i
     <div className="w-full flex flex-col items-center justify-center p-12 bg-gray-900/50 border border-dashed border-gray-800 rounded-2xl text-center">
       <div className="text-5xl mb-4">{icon}</div>
       <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-      <p className="text-gray-400 max-w-sm mb-6">{description}</p>
+      <p className="text-gray-400 max-w-sm mb-6 leading-relaxed">{description}</p>
       {actionText && onAction && (
         <button
           onClick={onAction}

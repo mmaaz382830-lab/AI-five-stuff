@@ -59,74 +59,87 @@ export default function HistoryList() {
         <h2 className="text-xl font-bold text-white">Your Saved Reels ({history.length})</h2>
         <button
           onClick={handleClearAll}
-          className="text-sm text-red-400 hover:text-red-300 font-medium"
+          className="text-sm text-red-400 hover:text-red-300 font-medium transition-colors"
         >
           Clear All
         </button>
       </div>
 
       <div className="space-y-4">
-        {history.map((reel) => (
-          <div key={reel.id} className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-sm">
-            {/* Header / Summary */}
+        {history.map((reel) => {
+          const isAI = reel.mode === "ai";
+          return (
             <div 
-              className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center cursor-pointer hover:bg-gray-800/50 transition-colors"
-              onClick={() => setExpandedId(expandedId === reel.id ? null : reel.id)}
+              key={reel.id} 
+              className={`bg-gray-900 border rounded-xl overflow-hidden shadow-sm transition-colors ${
+                isAI ? 'border-purple-900/50 hover:border-purple-500/50' : 'border-gray-800 hover:border-blue-500/50'
+              }`}
             >
-              <div className="mb-4 sm:mb-0">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="text-lg font-bold text-white">{reel.topic}</h3>
-                  <span className="bg-blue-900/50 text-blue-300 text-xs px-2 py-1 rounded-md">{reel.style}</span>
+              {/* Header / Summary */}
+              <div 
+                className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center cursor-pointer hover:bg-gray-800/50 transition-colors"
+                onClick={() => setExpandedId(expandedId === reel.id ? null : reel.id)}
+              >
+                <div className="mb-4 sm:mb-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="text-lg font-bold text-white">{reel.topic}</h3>
+                    <span className={`text-xs px-2 py-1 rounded-md ${
+                      isAI ? 'bg-purple-900/50 text-purple-300' : 'bg-blue-900/50 text-blue-300'
+                    }`}>
+                      {reel.style}
+                    </span>
+                    {isAI && <span className="text-xs bg-purple-900/30 text-purple-400 px-2 py-1 rounded-md border border-purple-800/50">AI ✨</span>}
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    {new Date(reel.createdAt).toLocaleDateString()} • {reel.duration}
+                  </p>
+                  <p className="text-gray-400 text-sm mt-2 line-clamp-1 italic border-l-2 border-gray-700 pl-2">
+                    "{reel.hook}"
+                  </p>
                 </div>
-                <p className="text-gray-400 text-sm">
-                  {new Date(reel.createdAt).toLocaleDateString()} • {reel.duration}
-                </p>
-                <p className="text-gray-500 text-sm mt-2 line-clamp-1 italic">
-                  "{reel.hook}"
-                </p>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                  <FavoriteButton 
+                    isFavorite={reel.isFavorite} 
+                    onToggle={() => handleToggleFavorite(reel.id)} 
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(reel.id);
+                    }}
+                    className="p-2 bg-gray-800 text-gray-400 hover:bg-red-900/50 hover:text-red-400 rounded-md transition-colors"
+                    title="Delete"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                  <button className={`text-sm font-medium px-3 py-1 ${isAI ? 'text-purple-400 hover:text-purple-300' : 'text-blue-400 hover:text-blue-300'}`}>
+                    {expandedId === reel.id ? "Hide" : "View"}
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <FavoriteButton 
-                  isFavorite={reel.isFavorite} 
-                  onToggle={() => handleToggleFavorite(reel.id)} 
-                />
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(reel.id);
-                  }}
-                  className="p-2 bg-gray-800 text-gray-400 hover:bg-red-900/50 hover:text-red-400 rounded-md transition-colors"
-                  title="Delete"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                <button className="text-sm font-medium text-blue-400 hover:text-blue-300 px-3 py-1">
-                  {expandedId === reel.id ? "Hide" : "View"}
-                </button>
-              </div>
+              {/* Expanded Content */}
+              {expandedId === reel.id && (
+                <div className="border-t border-gray-800 p-5 bg-black/30 space-y-4">
+                  <div className="flex justify-end mb-2">
+                    <ExportButton reel={reel} />
+                  </div>
+                  <OutputCard title="Hook" content={reel.hook} />
+                  <OutputCard title="Reel Script" content={reel.script} />
+                  <OutputCard title="Scene Breakdown" content={reel.scenes} />
+                  <OutputCard title="Screen Text" content={reel.screenText} />
+                  <OutputCard title="Voiceover" content={reel.voiceover} />
+                  <OutputCard title="AI Video Prompt" content={reel.videoPrompt} />
+                  <OutputCard title="Caption" content={reel.caption} />
+                  <OutputCard title="Hashtags" content={reel.hashtags.join(" ")} />
+                </div>
+              )}
             </div>
-
-            {/* Expanded Content */}
-            {expandedId === reel.id && (
-              <div className="border-t border-gray-800 p-5 bg-black/30 space-y-4">
-                <div className="flex justify-end mb-2">
-                  <ExportButton reel={reel} />
-                </div>
-                <OutputCard title="Hook" content={reel.hook} />
-                <OutputCard title="Reel Script" content={reel.script} />
-                <OutputCard title="Scene Breakdown" content={reel.scenes} />
-                <OutputCard title="Screen Text" content={reel.screenText} />
-                <OutputCard title="Voiceover" content={reel.voiceover} />
-                <OutputCard title="AI Video Prompt" content={reel.videoPrompt} />
-                <OutputCard title="Caption" content={reel.caption} />
-                <OutputCard title="Hashtags" content={reel.hashtags.join(" ")} />
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

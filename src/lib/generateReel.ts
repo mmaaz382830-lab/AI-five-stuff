@@ -24,9 +24,6 @@ export type GenerateInputs = {
 };
 
 export function generateReelFromTemplate(inputs: GenerateInputs): ReelPackage {
-  // In Phase 3, we use a template-based randomization.
-  // We mock the ID and createdAt since we aren't saving to LocalStorage yet.
-  
   return {
     id: crypto.randomUUID(),
     topic: inputs.topic,
@@ -44,6 +41,7 @@ export function generateReelFromTemplate(inputs: GenerateInputs): ReelPackage {
     hashtags: getRandom(hashtagsList),
     isFavorite: false,
     createdAt: new Date().toISOString(),
+    mode: "template",
   };
 }
 
@@ -72,5 +70,6 @@ export async function generateReelFromAI(inputs: GenerateInputs): Promise<ReelPa
     language: inputs.language,
     isFavorite: false,
     createdAt: new Date().toISOString(),
+    mode: "ai",
   } as ReelPackage;
 }
