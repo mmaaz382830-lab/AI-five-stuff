@@ -8,7 +8,10 @@ export default function Navbar() {
           <span>🎥</span>
           <span>Five Stuff <span className="text-blue-500">Studio</span></span>
         </Link>
-        <div>
+        <div className="flex items-center gap-4">
+          <Link href="/history" className="text-gray-300 hover:text-white text-sm font-medium transition-colors">
+            History
+          </Link>
           <Link href="/studio" className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
             Studio
           </Link>

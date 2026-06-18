@@ -5,14 +5,24 @@ import GeneratorForm from "@/components/GeneratorForm";
 import OutputCard from "@/components/OutputCard";
 import { generateReelFromTemplate, GenerateInputs } from "@/lib/generateReel";
 import { ReelPackage } from "@/types";
+import { saveReel } from "@/lib/storage";
 
 export default function StudioPage() {
   const [result, setResult] = useState<ReelPackage | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const handleGenerate = (inputs: GenerateInputs) => {
     // In Phase 3, this is an offline template generation
     const generated = generateReelFromTemplate(inputs);
     setResult(generated);
+    setSaved(false); // Reset saved state on new generation
+  };
+
+  const handleSave = () => {
+    if (result) {
+      saveReel(result);
+      setSaved(true);
+    }
   };
 
   return (
@@ -38,14 +48,25 @@ export default function StudioPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4 flex justify-between items-center">
+              <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <span className="text-blue-400 font-semibold mr-2">Topic:</span>
-                  <span className="text-white">{result.topic}</span>
+                  <span className="text-white mr-3">{result.topic}</span>
+                  <span className="text-xs bg-blue-900 text-blue-200 px-3 py-1 rounded-full inline-block mt-2 sm:mt-0">
+                    Template Mode
+                  </span>
                 </div>
-                <div className="text-xs bg-blue-900 text-blue-200 px-3 py-1 rounded-full">
-                  Template Mode
-                </div>
+                <button
+                  onClick={handleSave}
+                  disabled={saved}
+                  className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${
+                    saved 
+                      ? "bg-green-900/40 text-green-400 border border-green-800 cursor-not-allowed" 
+                      : "bg-gray-800 hover:bg-gray-700 text-white"
+                  }`}
+                >
+                  {saved ? "Saved to History ✓" : "Save to History"}
+                </button>
               </div>
 
               <OutputCard title="Hook" content={result.hook} />
