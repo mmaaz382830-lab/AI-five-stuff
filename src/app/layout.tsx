@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ToastProvider } from "@/components/Toast";
 import BackToTop from "@/components/BackToTop";
+import { Analytics } from "@vercel/analytics/react";
 
 const displayFont = Space_Grotesk({
   variable: "--font-display",
@@ -50,6 +51,7 @@ export default function RootLayout({
           </main>
           <Footer />
           <BackToTop />
+          <Analytics />
         </ToastProvider>
       </body>
     </html>

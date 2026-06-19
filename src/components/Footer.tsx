@@ -80,7 +80,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/five-stuff"
+                  href="https://github.com/mmaaz382830-lab"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition-colors group"
