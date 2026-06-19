@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import CopyButton from "./CopyButton";
+import { useToast } from "./Toast";
 
 interface OutputCardProps {
   title: string;
@@ -73,6 +77,9 @@ const DEFAULT_ACCENT: SectionAccent = {
 };
 
 export default function OutputCard({ title, content, animationDelay }: OutputCardProps) {
+  const { showToast } = useToast();
+  const [isExpanded, setIsExpanded] = useState(false);
+  
   const isArray = Array.isArray(content);
   const copyText = isArray ? (content as string[]).join("\n") : (content as string);
 
@@ -81,6 +88,16 @@ export default function OutputCard({ title, content, animationDelay }: OutputCar
   const isHashtags = title === "Hashtags";
 
   const accent = ACCENTS[title] ?? DEFAULT_ACCENT;
+  const canCollapse = title === "Reel Script" || title === "Scene Breakdown";
+
+  // Helper to count words
+  const getWordCount = (text: string | string[]) => {
+    const str = Array.isArray(text) ? text.join(" ") : text;
+    return str.trim().split(/\s+/).filter(Boolean).length;
+  };
+
+  const wordCount = getWordCount(content);
+  const readingTime = Math.max(1, Math.round(wordCount / 2.5));
 
   return (
     <div
@@ -89,15 +106,28 @@ export default function OutputCard({ title, content, animationDelay }: OutputCar
     >
       {/* Header row */}
       <div className="flex justify-between items-center mb-3 gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-wrap">
           <h3 className={`text-base font-bold truncate ${accent.headerColor}`}>{title}</h3>
           {accent.tag && (
             <span className={`hidden sm:inline-block text-[10px] font-bold tracking-widest px-2 py-0.5 rounded-full border opacity-60 ${accent.headerColor} border-current`}>
               {accent.tag}
             </span>
           )}
+          {title === "Reel Script" && (
+            <span className="text-[11px] bg-blue-900/40 text-blue-300 border border-blue-800/40 px-2.5 py-0.5 rounded-full font-medium">
+              ~{wordCount} words
+            </span>
+          )}
+          {title === "Voiceover" && (
+            <span className="text-[11px] bg-indigo-900/40 text-indigo-300 border border-indigo-800/40 px-2.5 py-0.5 rounded-full font-medium">
+              ~{readingTime}s read
+            </span>
+          )}
         </div>
-        <CopyButton text={copyText} />
+        <CopyButton
+          text={copyText}
+          onCopied={() => showToast(`${title} copied ✓`, "success")}
+        />
       </div>
 
       {/* Content area */}
@@ -110,25 +140,11 @@ export default function OutputCard({ title, content, animationDelay }: OutputCar
             : "text-gray-200 text-[15px] leading-[1.75]"
         }`}
       >
-        {isHashtags && isArray ? (
-          /* Chip-style hashtag rendering */
-          <div className="flex flex-wrap gap-2">
-            {(content as string[]).map((tag, i) => (
-              <span
-                key={i}
-                className="inline-block bg-teal-900/40 border border-teal-700/50 text-teal-300 text-xs font-medium px-3 py-1 rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        ) : isHashtags && !isArray ? (
-          /* Hashtags as a string — split on whitespace and render chips */
-          <div className="flex flex-wrap gap-2">
-            {String(content)
-              .split(/\s+/)
-              .filter(Boolean)
-              .map((tag, i) => (
+        <div className={canCollapse && !isExpanded ? "line-clamp-4 overflow-hidden" : ""}>
+          {isHashtags && isArray ? (
+            /* Chip-style hashtag rendering */
+            <div className="flex flex-wrap gap-2">
+              {(content as string[]).map((tag, i) => (
                 <span
                   key={i}
                   className="inline-block bg-teal-900/40 border border-teal-700/50 text-teal-300 text-xs font-medium px-3 py-1 rounded-full"
@@ -136,20 +152,45 @@ export default function OutputCard({ title, content, animationDelay }: OutputCar
                   {tag}
                 </span>
               ))}
-          </div>
-        ) : isArray ? (
-          <ul className="list-disc list-inside space-y-2 pl-1">
-            {(content as string[]).map((item, i) => (
-              <li key={i} className="text-gray-200 leading-[1.7]">
-                {item}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="whitespace-pre-wrap">{content}</p>
+            </div>
+          ) : isHashtags && !isArray ? (
+            /* Hashtags as a string — split on whitespace and render chips */
+            <div className="flex flex-wrap gap-2">
+              {String(content)
+                .split(/\s+/)
+                .filter(Boolean)
+                .map((tag, i) => (
+                  <span
+                    key={i}
+                    className="inline-block bg-teal-900/40 border border-teal-700/50 text-teal-300 text-xs font-medium px-3 py-1 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+            </div>
+          ) : isArray ? (
+            <ul className="list-disc list-inside space-y-2 pl-1">
+              {(content as string[]).map((item, i) => (
+                <li key={i} className="text-gray-200 leading-[1.7]">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="whitespace-pre-wrap">{content}</p>
+          )}
+        </div>
+        {canCollapse && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className={`mt-3 text-xs font-bold transition-all flex items-center gap-1.5 focus:outline-none ${
+              isExpanded ? "text-gray-400 hover:text-white" : accent.headerColor
+            }`}
+          >
+            <span>{isExpanded ? "Show less ↑" : "Show more ↓"}</span>
+          </button>
         )}
       </div>
     </div>
   );
 }
-

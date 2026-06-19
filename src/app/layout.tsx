@@ -3,6 +3,8 @@ import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { ToastProvider } from "@/components/Toast";
+import BackToTop from "@/components/BackToTop";
 
 const displayFont = Space_Grotesk({
   variable: "--font-display",
@@ -40,12 +42,15 @@ export default function RootLayout({
       className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col text-[#e6eef8]">
-        <Navbar />
-        {/* #62 Page fade-in animation wraps every page */}
-        <main className="flex-1 flex flex-col animate-fadeIn">
-          {children}
-        </main>
-        <Footer />
+        <ToastProvider>
+          <Navbar />
+          {/* #62 Page fade-in animation wraps every page */}
+          <main className="flex-1 flex flex-col animate-fadeIn">
+            {children}
+          </main>
+          <Footer />
+          <BackToTop />
+        </ToastProvider>
       </body>
     </html>
   );

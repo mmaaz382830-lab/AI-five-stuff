@@ -11,10 +11,14 @@ export interface ToastItem {
   id: number;
   message: string;
   type: ToastType;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
 interface ToastContextValue {
-  showToast: (message: string, type?: ToastType) => void;
+  showToast: (message: string, type?: ToastType, action?: { label: string; onClick: () => void }) => void;
 }
 
 /* ─────────────────────────────────────────────
@@ -77,9 +81,9 @@ function ToastBubble({
         text-sm font-medium backdrop-blur-sm
         transition-all duration-300 ease-out
         ${colors[item.type]}
-        ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}
+        ${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-3 scale-95"}
       `}
-      style={{ minWidth: "220px", maxWidth: "360px" }}
+      style={{ minWidth: "240px", maxWidth: "380px" }}
     >
       <span
         className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${iconColors[item.type]}`}
@@ -87,6 +91,18 @@ function ToastBubble({
         {icons[item.type]}
       </span>
       <span className="flex-1 leading-snug">{item.message}</span>
+      {item.action && (
+        <button
+          onClick={() => {
+            item.action?.onClick();
+            setVisible(false);
+            setTimeout(() => onRemove(item.id), 300);
+          }}
+          className="px-2.5 py-1 bg-white/10 hover:bg-white/20 text-white rounded text-xs font-bold transition-colors uppercase tracking-wider shrink-0"
+        >
+          {item.action.label}
+        </button>
+      )}
       <button
         onClick={() => {
           setVisible(false);
@@ -110,9 +126,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const showToast = useCallback(
-    (message: string, type: ToastType = "success") => {
+    (message: string, type: ToastType = "success", action?: { label: string; onClick: () => void }) => {
       const id = ++_uid;
-      setToasts((prev) => [...prev, { id, message, type }]);
+      setToasts((prev) => {
+        const next = [...prev, { id, message, type, action }];
+        if (next.length > 3) {
+          // Drop the oldest toast
+          return next.slice(next.length - 3);
+        }
+        return next;
+      });
     },
     []
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GenerateInputs, GenerateMode } from "@/lib/generateReel";
 
 interface GeneratorFormProps {
@@ -29,6 +29,37 @@ export default function GeneratorForm({
 
   const [customTopic, setCustomTopic] = useState("");
 
+  // Load last used settings on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("five-stuff-reel-last-settings");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed) {
+          // Merge safely to prevent structure breakage
+          setFormData((prev) => ({ ...prev, ...parsed }));
+          if (parsed.customTopic) {
+            setCustomTopic(parsed.customTopic);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load last settings from localStorage", e);
+    }
+  }, []);
+
+  // Write settings on change
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        "five-stuff-reel-last-settings",
+        JSON.stringify({ ...formData, customTopic })
+      );
+    } catch (e) {
+      console.error("Failed to write settings to localStorage", e);
+    }
+  }, [formData, customTopic]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
@@ -48,11 +79,39 @@ export default function GeneratorForm({
     onGenerate(finalData);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    // Submit on Ctrl+Enter or Cmd+Enter
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      const finalData = { ...formData };
+      if (formData.topic === "Custom Topic") {
+        finalData.topic = customTopic || "Random Idea";
+      }
+      onGenerate(finalData);
+    }
+  };
+
+  const handleRandomTopic = () => {
+    const topics = [
+      "Student Life",
+      "Coding Life",
+      "AI Tools",
+      "Exam Stress",
+      "Friends",
+      "Family",
+      "Internet Habits",
+      "Daily Chaos",
+    ];
+    const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+    setFormData((prev) => ({ ...prev, topic: randomTopic }));
+  };
+
   const isAI = formData.mode === "ai";
 
   return (
     <form
       onSubmit={handleSubmit}
+      onKeyDown={handleKeyDown}
       className="form-card-lift bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-lg space-y-5
                  shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_8px_32px_rgba(2,6,23,0.7)]"
     >
@@ -97,29 +156,39 @@ export default function GeneratorForm({
       {/* ── Fields grid ─────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
         {/* Topic */}
-        <div>
+        <div className="sm:col-span-2">
           <label className={labelClass}>Topic</label>
-          <select
-            name="topic"
-            value={formData.topic}
-            onChange={handleChange}
-            className={selectClass}
-          >
-            <option>Student Life</option>
-            <option>Coding Life</option>
-            <option>AI Tools</option>
-            <option>Exam Stress</option>
-            <option>Friends</option>
-            <option>Family</option>
-            <option>Internet Habits</option>
-            <option>Daily Chaos</option>
-            <option>Custom Topic</option>
-          </select>
+          <div className="flex gap-2">
+            <select
+              name="topic"
+              value={formData.topic}
+              onChange={handleChange}
+              className={selectClass}
+            >
+              <option>Student Life</option>
+              <option>Coding Life</option>
+              <option>AI Tools</option>
+              <option>Exam Stress</option>
+              <option>Friends</option>
+              <option>Family</option>
+              <option>Internet Habits</option>
+              <option>Daily Chaos</option>
+              <option>Custom Topic</option>
+            </select>
+            <button
+              type="button"
+              onClick={handleRandomTopic}
+              className="p-3 bg-gray-800 border border-gray-700 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center justify-center shrink-0 active:scale-95 duration-150"
+              title="Pick random topic 🎲"
+            >
+              🎲
+            </button>
+          </div>
         </div>
 
         {/* Custom Topic Input */}
         {formData.topic === "Custom Topic" && (
-          <div>
+          <div className="sm:col-span-2">
             <label className={labelClass}>Custom Topic</label>
             <input
               type="text"
@@ -197,7 +266,7 @@ export default function GeneratorForm({
         </div>
 
         {/* Creativity */}
-        <div>
+        <div className="sm:col-span-2">
           <label className={labelClass}>Creativity Level</label>
           <select
             name="creativity"
@@ -254,6 +323,9 @@ export default function GeneratorForm({
           "Generate Reel Package"
         )}
       </button>
+      <div className="text-center">
+        <span className="text-[11px] text-gray-500">Shortcut: Press Ctrl+Enter to generate</span>
+      </div>
     </form>
   );
 }
