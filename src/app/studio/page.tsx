@@ -4,21 +4,27 @@ import { useState } from "react";
 import GeneratorForm from "@/components/GeneratorForm";
 import OutputCard from "@/components/OutputCard";
 import ExportButton from "@/components/ExportButton";
+import OutputSkeleton from "@/components/Skeleton";
+import { ToastProvider, useToast } from "@/components/Toast";
 import { generateReelFromTemplate, generateReelFromAI, GenerateInputs } from "@/lib/generateReel";
 import { ReelPackage } from "@/types";
 import { saveReel } from "@/lib/storage";
 
-export default function StudioPage() {
+/* ── Inner page — has access to toast context ──────────── */
+function StudioInner() {
+  const { showToast } = useToast();
   const [result, setResult] = useState<ReelPackage | null>(null);
   const [saved, setSaved] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isAI, setIsAI] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedMode, setGeneratedMode] = useState<string>("Template Mode");
 
   const handleGenerate = async (inputs: GenerateInputs) => {
     setError(null);
     setIsGenerating(true);
-    
+    setIsAI(inputs.mode === "ai");
+
     try {
       let generated: ReelPackage;
       if (inputs.mode === "ai") {
@@ -29,81 +35,120 @@ export default function StudioPage() {
         setGeneratedMode("Template Mode");
       }
       setResult(generated);
-      setSaved(false); // Reset saved state on new generation
+      setSaved(false);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Something went wrong. Try again or use template mode.");
+      const msg = err.message || "Something went wrong. Try again or use Template Mode.";
+      setError(msg);
+      showToast(msg, "error");
     } finally {
       setIsGenerating(false);
     }
   };
 
   const handleSave = () => {
-    if (result) {
+    if (result && !saved) {
       saveReel(result);
       setSaved(true);
+      showToast("Saved to History ✓", "success");
     }
   };
 
+  const aiMode = generatedMode.includes("AI");
+
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl md:text-4xl font-extrabold font-display text-white mb-2">Reel Studio</h1>
-        <p className="text-gray-300 leading-relaxed">Select your preferences to generate a complete reel package.</p>
+    <div className="animate-slideUp w-full max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      {/* ── Page header ───────────────────────────────── */}
+      <div className="mb-10">
+        <h1 className="text-3xl md:text-4xl font-extrabold font-display text-white mb-2 leading-tight">
+          Reel Studio
+        </h1>
+        <p className="text-gray-400 leading-relaxed text-[16px] max-w-lg">
+          Pick your settings and generate a complete, shareable reel package in seconds.
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Form */}
-        <div className="lg:col-span-4">
+      {/* ── Two-column layout ─────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        {/* Left — Form (sticky on desktop) */}
+        <div className="lg:col-span-4 lg:sticky lg:top-6">
           <GeneratorForm onGenerate={handleGenerate} isGenerating={isGenerating} />
+
+          {/* Error banner below form */}
           {error && (
-            <div className="mt-4 p-4 bg-red-900/30 border border-red-800 rounded-xl text-red-400 text-sm">
-              <p className="font-semibold mb-1">Error Generating Reel</p>
+            <div className="animate-slideUp mt-4 p-4 bg-red-950/40 border border-red-800/60 rounded-xl text-red-300 text-sm leading-relaxed">
+              <p className="font-semibold mb-1 flex items-center gap-1.5">
+                <span className="text-red-400">⚠</span> Generation Failed
+              </p>
               <p>{error}</p>
             </div>
           )}
         </div>
 
-        {/* Right Column: Results */}
-        <div className="lg:col-span-8">
+        {/* Right — Output area */}
+        <div className="lg:col-span-8 min-w-0">
           {isGenerating ? (
-            <div className="h-full min-h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-2xl bg-gray-900/20 text-blue-400 p-8 text-center">
-              <svg className="animate-spin h-10 w-10 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p className="font-semibold text-lg animate-pulse">Generating your Reel Package...</p>
-              <p className="text-gray-400 text-sm mt-2">This usually takes about 5-10 seconds with AI.</p>
-            </div>
+            <OutputSkeleton />
           ) : !result ? (
-            <div className="h-full min-h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-gray-800 rounded-2xl bg-gray-900/50 text-gray-400 p-8 text-center">
-              <span className="text-4xl mb-4">✨</span>
-              <p>Your generated reel package will appear here.</p>
-              <p className="text-sm mt-2">Fill out the form and hit generate to get started.</p>
+            /* ── Empty state ── */
+            <div className="animate-fadeIn h-full min-h-[420px] flex flex-col items-center justify-center
+                            border border-dashed border-gray-800/70 rounded-2xl bg-gray-900/30 p-10 text-center">
+              <div className="relative mb-5">
+                <div className="absolute inset-0 bg-blue-500/10 blur-2xl rounded-full scale-150" />
+                <div className="relative w-16 h-16 rounded-full bg-gray-800/60 border border-gray-700/50 flex items-center justify-center text-3xl">
+                  ✨
+                </div>
+              </div>
+              <p className="text-white font-semibold text-lg mb-1">Your Reel Package</p>
+              <p className="text-gray-500 text-[15px] max-w-xs leading-relaxed">
+                Fill out the form on the left and hit Generate to create your complete reel package.
+              </p>
             </div>
           ) : (
-            <div className="space-y-6">
-              <div className={`rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border ${
-                generatedMode.includes('AI') ? 'bg-purple-900/20 border-purple-800/50 shadow-[0_0_15px_rgba(147,51,234,0.1)]' : 'bg-blue-900/20 border-blue-800/50'
-              }`}>
-                <div>
-                  <span className={`${generatedMode.includes('AI') ? 'text-purple-400' : 'text-blue-400'} font-semibold mr-2`}>Topic:</span>
-                  <span className="text-white mr-3">{result.topic}</span>
-                  <span className={`text-xs px-3 py-1 rounded-full inline-block mt-2 sm:mt-0 ${
-                    generatedMode.includes('AI') ? 'bg-purple-900/50 text-purple-200 border border-purple-800' : 'bg-blue-900/50 text-blue-200'
-                  }`}>
-                    {generatedMode}
-                  </span>
+            /* ── Results ── */
+            <div className="space-y-4 stagger-children">
+              {/* Meta / action bar */}
+              <div
+                className={`animate-revealCard rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border ${
+                  aiMode
+                    ? "bg-purple-950/25 border-purple-800/50 shadow-[0_0_20px_rgba(147,51,234,0.08)]"
+                    : "bg-blue-950/20 border-blue-800/40"
+                }`}
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`text-sm font-semibold ${aiMode ? "text-purple-400" : "text-blue-400"}`}>
+                      Topic:
+                    </span>
+                    <span className="text-white font-medium truncate max-w-[200px]">{result.topic}</span>
+                    <span
+                      className={`text-[11px] px-2.5 py-0.5 rounded-full font-semibold tracking-wide ${
+                        aiMode
+                          ? "bg-purple-900/60 text-purple-200 border border-purple-700/50"
+                          : "bg-blue-900/60 text-blue-200 border border-blue-700/50"
+                      }`}
+                    >
+                      {generatedMode}
+                    </span>
+                  </div>
+                  <p className="text-gray-500 text-xs mt-1">
+                    {result.style} · {result.format} · {result.duration}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <ExportButton reel={result} />
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <ExportButton
+                    reel={result}
+                    onExported={() => showToast("Exported as .txt ✓", "success")}
+                  />
                   <button
                     onClick={handleSave}
                     disabled={saved}
-                    className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${
-                      saved 
-                        ? "bg-green-900/40 text-green-400 border border-green-800 cursor-not-allowed" 
-                        : "bg-gray-800 hover:bg-gray-700 text-white"
+                    className={`btn-press text-sm font-semibold px-4 py-2 rounded-lg transition-all ${
+                      saved
+                        ? "bg-emerald-900/30 text-emerald-400 border border-emerald-800/50 cursor-not-allowed"
+                        : "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 hover:border-gray-600"
                     }`}
                   >
                     {saved ? "Saved ✓" : "Save"}
@@ -111,18 +156,28 @@ export default function StudioPage() {
                 </div>
               </div>
 
-              <OutputCard title="Hook" content={result.hook} />
-              <OutputCard title="Reel Script" content={result.script} />
-              <OutputCard title="Scene Breakdown" content={result.scenes} />
-              <OutputCard title="Screen Text" content={result.screenText} />
-              <OutputCard title="Voiceover" content={result.voiceover} />
-              <OutputCard title="AI Video Prompt" content={result.videoPrompt} />
-              <OutputCard title="Caption" content={result.caption} />
-              <OutputCard title="Hashtags" content={result.hashtags.join(" ")} />
+              {/* Output cards — staggered via CSS nth-child */}
+              <OutputCard title="Hook"            content={result.hook}                      animationDelay="0.05s" />
+              <OutputCard title="Reel Script"     content={result.script}                    animationDelay="0.10s" />
+              <OutputCard title="Scene Breakdown" content={result.scenes}                    animationDelay="0.15s" />
+              <OutputCard title="Screen Text"     content={result.screenText}               animationDelay="0.20s" />
+              <OutputCard title="Voiceover"       content={result.voiceover}                animationDelay="0.25s" />
+              <OutputCard title="AI Video Prompt" content={result.videoPrompt}              animationDelay="0.30s" />
+              <OutputCard title="Caption"         content={result.caption}                  animationDelay="0.35s" />
+              <OutputCard title="Hashtags"        content={result.hashtags.join(" ")}       animationDelay="0.40s" />
             </div>
           )}
         </div>
       </div>
     </div>
+  );
+}
+
+/* ── Page export — wraps inner with ToastProvider ──────── */
+export default function StudioPage() {
+  return (
+    <ToastProvider>
+      <StudioInner />
+    </ToastProvider>
   );
 }

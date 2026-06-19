@@ -31,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} h-full antialiased dark`}>
-      <body className="min-h-full flex flex-col bg-[#0a0a0a] text-[#ededed]">
+      <body className="min-h-full flex flex-col bg-gradient-to-br from-[#050508] via-[#06060a] to-[#071426] text-[#e6eef8] scroll-smooth">
         <Navbar />
         <main className="flex-1 flex flex-col">
           {children}
