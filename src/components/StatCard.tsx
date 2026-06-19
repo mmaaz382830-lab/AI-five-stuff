@@ -16,8 +16,8 @@ export default function StatCard({ value, label, detail }: StatCardProps) {
     // Parse any numbers in the value string
     const match = value.match(/^(\d+(?:\.\d+)?)(.*)$/);
     if (!match) {
-      setDisplayValue(value);
-      return;
+      const timer = setTimeout(() => setDisplayValue(value), 0);
+      return () => clearTimeout(timer);
     }
 
     const targetNum = parseFloat(match[1]);
@@ -26,8 +26,8 @@ export default function StatCard({ value, label, detail }: StatCardProps) {
     let hasRun = false;
     
     if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
-      setDisplayValue(value);
-      return;
+      const timer = setTimeout(() => setDisplayValue(value), 0);
+      return () => clearTimeout(timer);
     }
 
     const observer = new IntersectionObserver(
@@ -35,7 +35,6 @@ export default function StatCard({ value, label, detail }: StatCardProps) {
         const [entry] = entries;
         if (entry.isIntersecting && !hasRun) {
           hasRun = true;
-          let start = 0;
           const duration = 1200; // 1.2s animation duration
           const startTime = performance.now();
 

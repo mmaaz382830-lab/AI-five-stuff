@@ -8,8 +8,8 @@ export default function ScrollReveal({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
-      setVisible(true);
-      return;
+      const timer = setTimeout(() => setVisible(true), 0);
+      return () => clearTimeout(timer);
     }
 
     const observer = new IntersectionObserver(

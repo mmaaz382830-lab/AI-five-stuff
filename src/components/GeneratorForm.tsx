@@ -36,11 +36,13 @@ export default function GeneratorForm({
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed) {
-          // Merge safely to prevent structure breakage
-          setFormData((prev) => ({ ...prev, ...parsed }));
-          if (parsed.customTopic) {
-            setCustomTopic(parsed.customTopic);
-          }
+          const timer = setTimeout(() => {
+            setFormData((prev) => ({ ...prev, ...parsed }));
+            if (parsed.customTopic) {
+              setCustomTopic(parsed.customTopic);
+            }
+          }, 0);
+          return () => clearTimeout(timer);
         }
       }
     } catch (e) {

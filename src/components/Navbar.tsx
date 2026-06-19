@@ -42,7 +42,12 @@ export default function Navbar() {
       const raw = localStorage.getItem('five-stuff-reel-history');
       if (raw) {
         const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) setHistoryCount(arr.length);
+        if (Array.isArray(arr)) {
+          const timer = setTimeout(() => {
+            setHistoryCount(arr.length);
+          }, 0);
+          return () => clearTimeout(timer);
+        }
       }
     } catch {
       // ignore

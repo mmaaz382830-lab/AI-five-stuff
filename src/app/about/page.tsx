@@ -76,7 +76,8 @@ export default function AboutPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -250,7 +251,7 @@ export default function AboutPage() {
                   GitHub Repository
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed text-gray-300">
-                  This project's code repository is fully public and documented on GitHub. Feel free to explore the code, review commits, and see the full system architecture!
+                  This project&apos;s code repository is fully public and documented on GitHub. Feel free to explore the code, review commits, and see the full system architecture!
                 </p>
               </div>
               <div className="mt-6">

@@ -28,8 +28,12 @@ export default function HistoryList() {
   const router = useRouter();
 
   useEffect(() => {
-    setHistory(getHistory());
-    setIsMounted(true);
+    const data = getHistory();
+    const timer = setTimeout(() => {
+      setHistory(data);
+      setIsMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Finalize any pending deletes if component unmounts
@@ -298,7 +302,7 @@ export default function HistoryList() {
                       {new Date(reel.createdAt).toLocaleDateString()} • {reel.duration} • {reel.format}
                     </p>
                     <p className="text-gray-400 text-sm mt-2 line-clamp-1 italic border-l-2 border-gray-700 pl-2">
-                      "{reel.hook}"
+                      &ldquo;{reel.hook}&rdquo;
                     </p>
                   </div>
 

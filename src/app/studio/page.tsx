@@ -15,7 +15,6 @@ export default function StudioPage() {
   const [result, setResult] = useState<ReelPackage | null>(null);
   const [saved, setSaved] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isAI, setIsAI] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedMode, setGeneratedMode] = useState<string>("Template Mode");
   const [lastInputs, setLastInputs] = useState<GenerateInputs | null>(null);
@@ -50,7 +49,6 @@ export default function StudioPage() {
   const handleGenerate = async (inputs: GenerateInputs) => {
     setError(null);
     setIsGenerating(true);
-    setIsAI(inputs.mode === "ai");
     setLastInputs(inputs);
 
     try {
@@ -77,9 +75,9 @@ export default function StudioPage() {
       setTimeout(() => {
         resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 150);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      const msg = err.message || "Something went wrong. Try again or use Template Mode.";
+      const msg = err instanceof Error ? err.message : "Something went wrong. Try again or use Template Mode.";
       setError(msg);
       showToast(msg, "error");
     } finally {
